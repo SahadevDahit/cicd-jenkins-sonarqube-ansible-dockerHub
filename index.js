@@ -30,6 +30,8 @@ app.get('/products', (req, res) => {
 });
 
 const port = 4000;
+//this secret_key is testing for sonarqube
+const secret_key = 'shgiuginoshviu7868jb';
 
 // Start the server and listen on the specified port
 app.listen(port, () => {
