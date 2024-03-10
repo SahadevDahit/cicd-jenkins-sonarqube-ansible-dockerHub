@@ -32,7 +32,7 @@ app.get('/products', (req, res) => {
 });
 
 const port = 4000;
-const secret_key = 'shgiuginoshviu7868jb';
+const secret_key = 'shgiuginoshviu7868jb12';
 
 // Start the server and listen on the specified port
 app.listen(port, () => {
