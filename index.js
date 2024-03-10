@@ -4,7 +4,7 @@ const app = express();
 
 app.get('/', (req, res) => {
     res.json({
-        message: 'Hello, World! , We have sucessfully deployed our webapp'
+        message: 'Hello, World! Welcome to the cicd pipeline, testing webhook'
     });
 
 
