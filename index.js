@@ -1,10 +1,12 @@
-// Import the express module
 const express = require('express');
 
 const app = express();
 
 app.get('/', (req, res) => {
-    res.send('Hello, World! Welcome to the cicd pipeline'); // Send a response to the client
+    res.json({
+        message: 'Hello, World! Welcome to the cicd pipeline, testing webhook'
+    });
+
 });
 app.get('/products', (req, res) => {
     // Assuming products are stored in an array called 'products'
@@ -30,7 +32,6 @@ app.get('/products', (req, res) => {
 });
 
 const port = 4000;
-//this secret_key is testing for sonarqube
 const secret_key = 'shgiuginoshviu7868jb';
 
 // Start the server and listen on the specified port

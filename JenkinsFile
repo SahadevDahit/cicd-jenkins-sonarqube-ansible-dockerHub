@@ -1,0 +1,84 @@
+pipeline {
+    agent any
+    
+    environment {
+        DOCKER_IMAGE_NAME = "dahitsahadev/test-node"
+        DOCKER_IMAGE_TAG = "latest"
+        ANSIBLE_INVENTORY = "/etc/ansible/playbook"
+        SSH_PRIVATE_KEY = "/var/lib/jenkins/workspace/test-node/ansible-key.pem"
+        ANSIBLE_SERVER_IP = "ubuntu@ec2-65-0-5-146.ap-south-1.compute.amazonaws.com"
+        SONAR_HOST_URL = 'http://13.201.47.149:9000'
+    }
+        
+    stages {
+        stage('Checkout') {
+            steps {
+                // Checkout the source code from your Git repository
+                git branch: 'main',
+                url: 'https://github.com/SahadevDahit/cicd-jenkins.git'
+            }
+        }
+        
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    sh "docker build --rm -t ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} ."
+                }
+            }
+        }
+
+        stage('Push Docker Image to Registry') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
+                    script {
+                        sh "echo ${DOCKERHUB_PASSWORD} | docker login -u ${DOCKERHUB_USERNAME} --password-stdin"
+                        sh "docker push ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
+                    }
+                }
+            }
+        }
+   
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('sonar_qube') {
+                    sh 'sonar-scanner --version'
+                    sh "sonar-scanner \
+                        -Dsonar.projectKey=test-node \
+                        -Dsonar.sources=. \
+                        -Dsonar.exclusions=node_modules/** \
+                        -Dsonar.host.url=${SONAR_HOST_URL} \
+                        -Dsonar.login=sqp_3f1c98433e3d99368028e1f5816dfc820f9869ef"
+                     
+                }
+            }
+        }
+        
+        stage('Run Ansible Playbook') {
+            steps {
+                script {
+                    sh """
+              ssh -o StrictHostKeyChecking=no -i /var/lib/jenkins/workspace/test-node/ansible-key.pem ${ANSIBLE_SERVER_IP} 'cd /; cd /etc/ansible/playbook; ansible-playbook 04_node_from_dockerHub'
+                       """
+                }
+            }
+        }
+    
+        stage('Deploy') {
+            steps {
+                echo 'Deploying the server'
+            }
+        }
+    }
+    
+    post {
+        success {
+            echo 'Build successful! Deploy your application.'
+            // Send notifications or perform additional actions on success
+        }
+        
+        failure {
+            echo 'Build failed! Check the logs for errors.'
+            // Send notifications or perform additional actions on failure
+        }
+    }
+}
