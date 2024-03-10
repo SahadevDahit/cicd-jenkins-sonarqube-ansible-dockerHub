@@ -18,6 +18,13 @@ pipeline {
                 url: 'https://github.com/SahadevDahit/cicd-jenkins.git'
             }
         }
+ 
+       stage('Remove Existing Docker Image') {
+            steps {
+                // Remove the Docker image if it exists
+                sh "docker rmi ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} || true"
+            }
+        }
         
         stage('Build Docker Image') {
             steps {
