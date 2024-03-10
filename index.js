@@ -4,7 +4,7 @@ const app = express();
 
 app.get('/', (req, res) => {
     res.json({
-        message: 'Hello, World! Welcome to the cicd pipeline, Sucessfull again'
+        message: 'Hello, World! Welcome to the cicd pipeline, Sucessfull again '
     });
 
 });
