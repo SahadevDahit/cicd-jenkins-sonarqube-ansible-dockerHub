@@ -1,0 +1,36 @@
+- name: Pull latest Docker image from Docker Hub and run container
+  hosts: servers
+  become: yes  # Enable sudo privileges
+
+  tasks:
+    - name: Ensure Docker container is stopped and removed if it exists
+      docker_container:
+        name: test_node   # Specify the name of the container
+        state: absent     # Ensure the container is absent
+
+    - name: Stop and remove the container if it's using the image
+      docker_container:
+        name: test_node   # Specify the name of the container
+        state: stopped    # Ensure the container is stopped
+        force_kill: yes   # Force kill the container if necessary
+        remove_volumes: yes  # Remove associated volumes if any
+        state: absent     # Ensure the container is absent
+
+    - name: Ensure Docker image is removed if it exists
+      docker_image:
+        name: dahitsahadev/test-node:latest   # Specify the name of the image to check
+        force: yes        # Force removal of the image
+        state: absent     # Ensure the image is absent
+
+    - name: Pull latest Docker image from Docker Hub
+      docker_image:
+        name: dahitsahadev/test-node:latest   # Specify the name of the image to pull from Docker Hub
+        source: pull                   # Indicate to pull the image from Docker Hub
+
+    - name: Run Docker container from the pulled image
+      docker_container:
+        name: test_node                # Specify the name of the container to run
+        image: dahitsahadev/test-node:latest  # Specify the name of the image to use for the container
+        state: started                 # Ensure that the container is started
+        ports:
+          - "4000:4000"                 # Specify the port mapping

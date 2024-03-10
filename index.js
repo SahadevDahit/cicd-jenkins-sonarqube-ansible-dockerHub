@@ -7,6 +7,7 @@ app.get('/', (req, res) => {
         message: 'Hello, World! Welcome to the cicd pipeline, testing webhook'
     });
 
+
 });
 app.get('/products', (req, res) => {
     // Assuming products are stored in an array called 'products'
